@@ -14,7 +14,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage("Checkout") {
             steps {
                 git "${GIT_REPOSITORY}"
             }

@@ -11,49 +11,56 @@ pipeline {
         DOCKER_REPOSITORY = "williamsayo/travelcalculator"
         DOCKER_TAG = "latest"
     }
-
     stages {
 
-        stage("Checkout") {
+        stage('Checkout') {
             steps {
-                git "${GIT_REPOSITORY}"
+                git ${GIT_REPOSITORY}
             }
         }
 
-        stage('Build') {
+        stage('Run Tests') {
             steps {
-                bat 'mvn clean install'
+                bat 'mvn clean test'
             }
         }
 
-        stage('Test') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-
-        stage('Publish Report') {
+        stage('Code Coverage') {
             steps {
                 bat 'mvn jacoco:report'
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Publish Coverage Report') {
+            steps {
+                jacoco()
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    appImage = docker.build("${DOCKER_REPOSITORY}:${DOCKER_TAG}")
+                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
                 }
             }
         }
 
-        stage('Publish Docker Image') {
+        stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS) {
-                        appImage.push()
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
                     }
                 }
             }
         }
+
     }
+
 }

@@ -8,7 +8,7 @@ pipeline {
     environment {
         GIT_REPOSITORY = "https://github.com/williamsayo/speed_calculator"
         DOCKER_CREDENTIALS = "docker_cred"
-        DOCKER_REPOSITORY = "williamsayo/travelcalculator"
+        DOCKER_REPOSITORY = "williamsayo/speed_calculator"
         DOCKER_TAG = "latest"
     }
     stages {
